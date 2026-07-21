@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>家用汽车退换车条件智能判断工具</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --bg-card: #f8f9fa;
+  --bg-input: #ffffff;
+  --text: #1a1a2e;
+  --text-secondary: #555;
+  --text-muted: #888;
+  --border: #dee2e6;
+  --accent: #2563eb;
+  --accent-light: #eff6ff;
+  --green: #16a34a;
+  --green-bg: #f0fdf4;
+  --red: #dc2626;
+  --red-bg: #fef2f2;
+  --yellow: #ca8a04;
+  --yellow-bg: #fefce8;
+  --orange: #ea580c;
+  --orange-bg: #fff7ed;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #f1f5f9;
+  color: var(--text);
+  line-height: 1.6;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  padding: 32px 20px 20px;
+}
+
+header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+header p {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.card {
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 28px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+
+.card h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--accent-light);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card h2 .icon { font-size: 20px; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-grid.col-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+}
+
+.form-group label .unit {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.form-group input, .form-group select {
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg-input);
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus, .form-group select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+.form-group input::placeholder { color: #bbb; }
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin-top: 4px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.btn-row {
+  text-align: center;
+  margin: 28px 0 12px;
+}
+
+.btn {
+  padding: 12px 48px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.4);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #fff;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border);
+  margin-left: 12px;
+}
+
+.btn-secondary:hover { background: var(--bg-card); }
+
+/* Results Section */
+.result-section {
+  display: none;
+}
+
+.result-section.show {
+  display: block;
+}
+
+.result-banner {
+  padding: 20px 24px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.result-banner.qualify {
+  background: var(--green-bg);
+  border: 2px solid var(--green);
+}
+
+.result-banner.not-qualify {
+  background: var(--red-bg);
+  border: 2px solid var(--red);
+}
+
+.result-banner.partial {
+  background: var(--yellow-bg);
+  border: 2px solid var(--yellow);
+}
+
+.result-banner .banner-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.result-banner .banner-content h3 {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.result-banner.qualify .banner-content h3 { color: var(--green); }
+.result-banner.not-qualify .banner-content h3 { color: var(--red); }
+.result-banner.partial .banner-content h3 { color: var(--yellow); }
+
+.result-banner .banner-content p {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Compensation Table */
+.comp-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 14px;
+}
+
+.comp-table th, .comp-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.comp-table th {
+  background: var(--bg-card);
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.comp-table .total-row td {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--accent);
+  border-top: 2px solid var(--accent);
+}
+
+.comp-table .deduct td {
+  color: var(--red);
+}
+
+.comp-table .amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: "SF Mono", "Consolas", monospace;
+}
+
+/* Legal Reference */
+.legal-ref {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin: 16px 0;
+}
+
+.legal-ref h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.legal-ref p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.legal-ref .highlight {
+  color: var(--red);
+  font-weight: 600;
+}
+
+/* Warning Box */
+.warning-box {
+  background: var(--yellow-bg);
+  border-left: 4px solid var(--yellow);
+  padding: 12px 16px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 12px 0;
+}
+
+.warning-box strong { color: var(--yellow); }
+
+/* Info tooltip */
+.info-tip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: var(--border);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: help;
+  margin-left: 4px;
+}
+
+.info-tip:hover { background: var(--accent); }
+
+.fade-in {
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .form-grid, .form-grid.col-3 {
+    grid-template-columns: 1fr;
+  }
+  .card { padding: 18px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>家用汽车退换车条件智能判断工具</h1>
+  <p>依据《家用汽车产品修理更换退货责任规定》(2022) 及 GB/T 43388-2023 · 含地方法规（浙江省）</p>
+</header>
+
+<!-- ====== 输入区 ====== -->
+<div class="card" id="input-card">
+  <h2><span class="icon">📋</span>车辆与故障信息</h2>
+
+  <div class="form-grid">
+    <div class="form-group">
+      <label>购车发票/交付日期 *</label>
+      <input type="date" id="invoiceDate">
+    </div>
+    <div class="form-group">
+      <label>发生故障日期 *</label>
+      <input type="date" id="faultDate">
+    </div>
+    <div class="form-group">
+      <label>发生故障时里程数 <span class="unit">(km)</span> *</label>
+      <input type="number" id="mileage" placeholder="例：2500" min="0" step="1">
+    </div>
+    <div class="form-group">
+      <label>车辆购买价格 <span class="unit">(元)</span> *</label>
+      <input type="number" id="carPrice" placeholder="例：150000" min="0" step="0.01">
+    </div>
+    <div class="form-group">
+      <label>所在省份 *</label>
+      <select id="province">
+        <option value="">请选择</option>
+        <optgroup label="特殊规定省份">
+          <option value="浙江">浙江省（地方规定更严格）</option>
+        </optgroup>
+        <optgroup label="其他省份（适用国家规定）">
+          <option value="北京">北京市</option><option value="上海">上海市</option>
+          <option value="广东">广东省</option><option value="江苏">江苏省</option>
+          <option value="山东">山东省</option><option value="四川">四川省</option>
+          <option value="湖北">湖北省</option><option value="湖南">湖南省</option>
+          <option value="河南">河南省</option><option value="河北">河北省</option>
+          <option value="福建">福建省</option><option value="安徽">安徽省</option>
+          <option value="辽宁">辽宁省</option><option value="陕西">陕西省</option>
+          <option value="重庆">重庆市</option><option value="天津">天津市</option>
+          <option value="江西">江西省</option><option value="广西">广西壮族自治区</option>
+          <option value="山西">山西省</option><option value="吉林">吉林省</option>
+          <option value="黑龙江">黑龙江省</option>
+          <option value="云南">云南省</option><option value="贵州">贵州省</option>
+          <option value="甘肃">甘肃省</option><option value="内蒙古">内蒙古自治区</option>
+          <option value="新疆">新疆维吾尔自治区</option>
+          <option value="海南">海南省</option><option value="宁夏">宁夏回族自治区</option>
+          <option value="青海">青海省</option><option value="西藏">西藏自治区</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>故障类型 *</label>
+      <select id="faultType">
+        <option value="">请选择故障类型</option>
+        <optgroup label="制动系统">
+          <option value="brake_failure">制动完全失效（行驶中丧失减速能力）</option>
+          <option value="brake_boost_failure">制动助力失效（踏板变硬但常规制动尚存）</option>
+          <option value="brake_severe_degrade">制动效能严重下降</option>
+          <option value="brake_major_part">制动系统主要零部件故障（非失效）</option>
+          <option value="brake_noise_wear">制动异响/抖动/磨损（一般故障）</option>
+        </optgroup>
+        <optgroup label="转向系统">
+          <option value="steering_failure">转向完全失效</option>
+          <option value="steering_power_loss">转向助力失效</option>
+        </optgroup>
+        <optgroup label="发动机/变速器/驱动电机">
+          <option value="engine_major">发动机需更换整体或主要零部件</option>
+          <option value="transmission_major">变速器需更换整体或主要零部件</option>
+          <option value="drive_motor_major">动力蓄电池/驱动电机需更换或主要零部件</option>
+        </optgroup>
+        <optgroup label="车身/燃油/起火">
+          <option value="body_crack">车身开裂</option>
+          <option value="fuel_leak">燃油泄漏</option>
+          <option value="battery_fire">动力蓄电池起火</option>
+          <option value="vehicle_self_ignite">车辆自燃</option>
+        </optgroup>
+        <optgroup label="安全装置/车辆失控">
+          <option value="safety_device_failure">安全装置失效</option>
+          <option value="vehicle_out_of_control">因质量问题引起车辆失控</option>
+        </optgroup>
+        <optgroup label="其他">
+          <option value="other">其他类型故障</option>
+        </optgroup>
+      </select>
+    </div>
+  </div>
+
+  <!-- 严重安全性能故障判断 -->
+  <div style="margin-top:20px; padding:16px; background:var(--bg-card); border-radius:var(--radius);">
+    <strong style="font-size:14px; color:var(--text-secondary);">严重安全性能故障判定 (GB/T 43388-2023)</strong>
+    <p style="font-size:12px; color:var(--text-muted); margin:4px 0 10px;">以下三个条件需<em>全部满足</em>，方可认定为"严重安全性能故障"：</p>
+    <div class="checkbox-group">
+      <label class="checkbox-item">
+        <input type="checkbox" id="attrSudden">
+        <span>突发性：故障在正常行驶中突然发生，驾驶员事先无法预见</span>
+      </label>
+      <label class="checkbox-item">
+        <input type="checkbox" id="attrUncontrollable">
+        <span>风险不可控性：故障发生后驾驶员难以控制车辆避免危险</span>
+      </label>
+      <label class="checkbox-item">
+        <input type="checkbox" id="attrSevere">
+        <span>后果严重性：故障可能导致人身伤亡或重大财产损失</span>
+      </label>
+    </div>
+    <p style="font-size:11px; color:var(--text-muted); margin-top:8px;">💡 制动失效、转向失效、动力失控等在 GB/T 43388-2023 附录A中被明确列为严重安全性能故障模式。</p>
+  </div>
+
+  <!-- 故障零部件信息 -->
+  <div class="form-grid" style="margin-top:20px;">
+    <div class="form-group full">
+      <label>故障涉及的主要零部件名称 <span class="unit">(选填，用于判断是否属于"主要零部件")</span></label>
+      <input type="text" id="partName" placeholder="例：制动总泵、ABS液压控制单元、制动助力器等">
+    </div>
+  </div>
+
+  <div class="checkbox-group" style="margin-top:4px;">
+    <label class="checkbox-item">
+      <input type="checkbox" id="isWearPart">
+      <span>该零部件属于易损耗零部件（如：制动片、制动盘、雨刮片、轮胎等）</span>
+    </label>
+  </div>
+</div>
+
+<!-- ====== 维修历史 ====== -->
+<div class="card">
+  <h2><span class="icon">🔧</span>维修历史</h2>
+
+  <div class="form-grid col-3">
+    <div class="form-group">
+      <label>同一故障累计维修次数</label>
+      <input type="number" id="repairCount" placeholder="0" min="0" value="0">
+    </div>
+    <div class="form-group">
+      <label>因质量问题累计维修天数</label>
+      <input type="number" id="repairDays" placeholder="0" min="0" value="0">
+    </div>
+    <div class="form-group">
+      <label>发动机/变速器整体更换次数</label>
+      <input type="number" id="engineReplaceCount" placeholder="0" min="0" value="0">
+    </div>
+  </div>
+
+  <div class="warning-box" style="margin-top:16px;">
+    <strong>注意：</strong>制动盘、制动片（刹车片）属于<strong>易损耗零部件</strong>，不适用"累计更换2次"退换车规则（仅适用于主要零部件）。制动总泵、制动助力器、ABS控制单元等属于主要零部件。
+  </div>
+</div>
+
+<!-- ====== 费用信息 ====== -->
+<div class="card">
+  <h2><span class="icon">💰</span>相关费用与使用补偿</h2>
+
+  <div class="form-grid col-3">
+    <div class="form-group">
+      <label>车辆登记费 <span class="unit">(元)</span></label>
+      <input type="number" id="regFee" placeholder="0" min="0" value="0">
+    </div>
+    <div class="form-group">
+      <label>加装/装饰费用 <span class="unit">(元)</span></label>
+      <input type="number" id="modFee" placeholder="0" min="0" value="0">
+    </div>
+    <div class="form-group">
+      <label>相关服务费 <span class="unit">(元)</span></label>
+      <input type="number" id="serviceFee" placeholder="0" min="0" value="0">
+    </div>
+    <div class="form-group">
+      <label>加装/装饰折旧率 <span class="unit">(% ，默认20%)</span></label>
+      <input type="number" id="depreciationRate" placeholder="20" min="0" max="100" step="1" value="20">
+    </div>
+    <div class="form-group">
+      <label>首次进店维修时里程 <span class="unit">(km，选填)</span></label>
+      <input type="number" id="firstRepairMileage" placeholder="留空则按故障时里程计算" min="0" step="1">
+    </div>
+  </div>
+
+  <!-- 使用补偿费区域 -->
+  <div style="margin-top:20px; padding:16px; background:var(--bg-card); border-radius:var(--radius); border-left:4px solid var(--accent);">
+    <strong style="font-size:14px; color:var(--accent);">📐 使用补偿费计算（第27条）</strong>
+    <p style="font-size:12px; color:var(--text-muted); margin:4px 0 10px;">
+      消费者退换车时<strong>应向销售者支付</strong>的合理使用补偿，仅三包期内有偿退换时适用。60日/3000km内免费退换不支付。
+    </p>
+
+    <div style="background:#fff; padding:12px; border-radius:6px; margin-bottom:12px; font-size:13px; font-family:'SF Mono','Consolas',monospace; color:var(--text); text-align:center; letter-spacing:1px;">
+      使用补偿费 = 车价款(元) × 行驶里程(km) ÷ 1000 × n
+    </div>
+
+    <div class="form-grid" style="grid-template-columns:2fr 1fr;">
+      <div class="form-group">
+        <label>使用补偿系数 n — 查看三包凭证上的明示值 <span class="unit">(法定上限 ≤ 0.5%)</span></label>
+        <select id="compCoeff">
+          <option value="0.5">0.5% — 法律上限（默认，如东风日产等）</option>
+          <option value="0.45">0.45%</option>
+          <option value="0.4">0.4%</option>
+          <option value="0.35">0.35%</option>
+          <option value="0.3">0.3%</option>
+          <option value="0.25">0.25%</option>
+          <option value="0.2">0.2%</option>
+          <option value="0.15">0.15%</option>
+          <option value="0.1">0.1%</option>
+          <option value="custom">自定义（输入下方）</option>
+        </select>
+      </div>
+      <div class="form-group" id="customCoeffGroup" style="display:none;">
+        <label>自定义 n 值 <span class="unit">(%)</span></label>
+        <input type="number" id="compCoeffCustom" placeholder="0.5" min="0" max="0.5" step="0.01" value="0.5">
+      </div>
+    </div>
+
+    <div class="checkbox-group" style="margin-top:6px;">
+      <label class="checkbox-item">
+        <input type="checkbox" id="useFirstRepairMileage">
+        <span>按首次进店维修里程计算（实务中消保委调解常用，对消费者更公平）</span>
+      </label>
+    </div>
+
+    <details style="margin-top:12px; font-size:12px; color:var(--text-muted);">
+      <summary style="cursor:pointer; font-weight:600; color:var(--text-secondary);">📋 常见品牌 n 系数参考（以三包凭证明示为准）</summary>
+      <table style="width:100%; border-collapse:collapse; margin-top:8px; font-size:12px;">
+        <thead><tr style="background:#f1f5f9;"><th style="padding:6px 10px;text-align:left;">品牌</th><th style="padding:6px 10px;text-align:right;">n 系数</th><th style="padding:6px 10px;text-align:left;">品牌</th><th style="padding:6px 10px;text-align:right;">n 系数</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:4px 10px;">东风日产</td><td style="padding:4px 10px;text-align:right;">0.5%</td><td style="padding:4px 10px;">吉利汽车</td><td style="padding:4px 10px;text-align:right;">0.6%（旧）</td></tr>
+          <tr><td style="padding:4px 10px;">北京现代</td><td style="padding:4px 10px;text-align:right;">0.5%</td><td style="padding:4px 10px;">宝马</td><td style="padding:4px 10px;text-align:right;">0.7%（旧）</td></tr>
+          <tr><td style="padding:4px 10px;">凯迪拉克（1年内）</td><td style="padding:4px 10px;text-align:right;">0.6%（旧）</td><td style="padding:4px 10px;">雷克萨斯</td><td style="padding:4px 10px;text-align:right;">0.8%（旧）</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:6px; color:var(--orange);">⚠️ 以上为2013版旧规下的数据（0.5%~0.8%）。2022年新规要求 n ≤ 0.5%。请以三包凭证上的明示值为准。</p>
+    </details>
+
+    <details style="margin-top:8px; font-size:12px; color:var(--text-muted);">
+      <summary style="cursor:pointer; font-weight:600; color:var(--text-secondary);">⚖️ 法规演变：旧标准 vs 新标准</summary>
+      <table style="width:100%; border-collapse:collapse; margin-top:8px; font-size:12px;">
+        <thead><tr style="background:#f1f5f9;"><th style="padding:6px 10px;text-align:left;">版本</th><th style="padding:6px 10px;text-align:left;">n 系数范围</th><th style="padding:6px 10px;text-align:left;">确定方式</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:4px 10px;">2013版（已废止）</td><td style="padding:4px 10px;">0.5% ~ 0.8%</td><td style="padding:4px 10px;">生产者根据使用时间、状况确定</td></tr>
+          <tr style="background:#f0fdf4;"><td style="padding:4px 10px;font-weight:600;">2022版（现行）</td><td style="padding:4px 10px;font-weight:600;color:var(--green);">≤ 0.5%（上限降低）</td><td style="padding:4px 10px;">生产者明示在三包凭证上</td></tr>
+        </tbody>
+      </table>
+    </details>
+  </div>
+</div>
+
+<div class="btn-row">
+  <button class="btn btn-primary" onclick="analyze()">🔍 开始智能判断</button>
+  <button class="btn btn-secondary" onclick="resetForm()">🔄 重置</button>
+</div>
+
+<!-- ====== 结果区 ====== -->
+<div class="result-section fade-in" id="resultSection">
+
+  <div id="resultBanner"></div>
+
+  <div class="card" id="compensationCard" style="display:none;">
+    <h2><span class="icon">💵</span>补偿明细</h2>
+    <table class="comp-table" id="compTable"></table>
+  </div>
+
+  <div class="card" id="legalCard" style="display:none;">
+    <h2><span class="icon">⚖️</span>适用法律依据</h2>
+    <div id="legalContent"></div>
+  </div>
+
+  <div class="card" id="notesCard" style="display:none;">
+    <h2><span class="icon">📝</span>重要提示与建议</h2>
+    <div id="notesContent"></div>
+  </div>
+
+</div>
+
+</div>
+
+<script>
+// ============ 自动填充：故障类型与严重安全性能故障联动 ============
+const faultTypeSelect = document.getElementById('faultType');
+const attrSudden = document.getElementById('attrSudden');
+const attrUncontrollable = document.getElementById('attrUncontrollable');
+const attrSevere = document.getElementById('attrSevere');
+
+// 根据故障类型自动勾选三个属性
+const autoCheckFaults = [
+  'brake_failure', 'brake_boost_failure', 'brake_severe_degrade',
+  'steering_failure',
+  'body_crack', 'fuel_leak', 'battery_fire',
+  'vehicle_self_ignite', 'safety_device_failure', 'vehicle_out_of_control'
+];
+
+faultTypeSelect.addEventListener('change', function() {
+  const shouldCheck = autoCheckFaults.includes(this.value);
+  attrSudden.checked = shouldCheck;
+  attrUncontrollable.checked = shouldCheck;
+  attrSevere.checked = shouldCheck;
+});
+
+// ============ 自定义补偿系数联动 ============
+document.getElementById('compCoeff').addEventListener('change', function() {
+  document.getElementById('customCoeffGroup').style.display = (this.value === 'custom') ? 'flex' : 'none';
+});
+
+// ============ 核心分析逻辑 ============
+function analyze() {
+  // --- 读取输入 ---
+  const invoiceDateStr = document.getElementById('invoiceDate').value;
+  const faultDateStr = document.getElementById('faultDate').value;
+  const mileage = parseFloat(document.getElementById('mileage').value);
+  const carPrice = parseFloat(document.getElementById('carPrice').value);
+  const province = document.getElementById('province').value;
+  const faultType = document.getElementById('faultType').value;
+  const partName = document.getElementById('partName').value.trim();
+  const isWearPart = document.getElementById('isWearPart').checked;
+  const repairCount = parseInt(document.getElementById('repairCount').value) || 0;
+  const repairDays = parseInt(document.getElementById('repairDays').value) || 0;
+  const engineReplaceCount = parseInt(document.getElementById('engineReplaceCount').value) || 0;
+  const regFee = parseFloat(document.getElementById('regFee').value) || 0;
+  const modFee = parseFloat(document.getElementById('modFee').value) || 0;
+  const serviceFee = parseFloat(document.getElementById('serviceFee').value) || 0;
+  const depreciationRate = parseFloat(document.getElementById('depreciationRate').value) || 20;
+  const firstRepairMileageRaw = parseFloat(document.getElementById('firstRepairMileage').value);
+  const firstRepairMileage = isNaN(firstRepairMileageRaw) ? null : firstRepairMileageRaw;
+  const useFirstRepairMileage = document.getElementById('useFirstRepairMileage').checked;
+
+  // 使用补偿系数：从下拉框或自定义输入读取
+  let compCoeff;
+  const coeffSelect = document.getElementById('compCoeff').value;
+  if (coeffSelect === 'custom') {
+    compCoeff = parseFloat(document.getElementById('compCoeffCustom').value) || 0.5;
+  } else {
+    compCoeff = parseFloat(coeffSelect) || 0.5;
+  }
+
+  const sudden = document.getElementById('attrSudden').checked;
+  const uncontrollable = document.getElementById('attrUncontrollable').checked;
+  const severe = document.getElementById('attrSevere').checked;
+
+  // --- 基础校验 ---
+  if (!invoiceDateStr || !faultDateStr || isNaN(mileage) || isNaN(carPrice) || !province || !faultType) {
+    alert('请填写所有带 * 的必填项。');
+    return;
+  }
+
+  const invoiceDate = new Date(invoiceDateStr + 'T00:00:00+08:00');
+  const faultDate = new Date(faultDateStr + 'T00:00:00+08:00');
+
+  if (faultDate < invoiceDate) {
+    alert('故障日期不能早于购车发票/交付日期。');
+    return;
+  }
+
+  const daysSinceDelivery = Math.floor((faultDate - invoiceDate) / (1000 * 60 * 60 * 24));
+  const isZhejiang = province === '浙江';
+  const isSeriousFault = sudden && uncontrollable && severe;
+
+  // --- 判断所处的时效/里程层级 ---
+  const tier7Day = daysSinceDelivery <= 7;
+  const tier60Day3000Km = daysSinceDelivery <= 60 && mileage <= 3000;
+  const tierWarranty = daysSinceDelivery <= 730 && mileage <= 50000; // 2年/5万km
+  const beyondWarranty = daysSinceDelivery > 730 || mileage > 50000;
+
+  // --- 核心判断逻辑 ---
+  let resultType = 'none'; // 'free_return' | 'paid_return' | 'none'
+  let resultReasons = [];
+  let resultLawRefs = [];
+  let freeReturn = false; // 是否需要支付使用补偿费
+
+  // ===== 第一层：7日退换（第22条） =====
+  if (tier7Day) {
+    const sevenDayFaults = ['engine_major', 'transmission_major', 'drive_motor_major'];
+    if (sevenDayFaults.includes(faultType)) {
+      resultType = 'free_return';
+      freeReturn = true;
+      resultReasons.push('购车7日内，发动机/变速器/动力蓄电池/驱动电机或其主要零部件需更换，符合第22条免费退换条件');
+      resultLawRefs.push('《家用汽车产品修理更换退货责任规定》第22条');
+    }
+  }
+
+  // ===== 第二层：60日/3000km退换（第23条 + 浙江第27条） =====
+  if (resultType === 'none' && tier60Day3000Km) {
+    // 国家规定的5种情形
+    const national60DayFaults = ['brake_failure', 'steering_failure', 'body_crack', 'fuel_leak', 'battery_fire'];
+    if (national60DayFaults.includes(faultType)) {
+      resultType = 'free_return';
+      freeReturn = true;
+      resultReasons.push('购车60日内或3000km内，发生' + getFaultLabel(faultType) + '，符合第23条免费退换条件');
+      resultLawRefs.push('《家用汽车产品修理更换退货责任规定》第23条');
+    }
+
+    // 浙江省额外扩展的4种情形
+    if (resultType === 'none' && isZhejiang) {
+      const zj60DayFaults = ['brake_boost_failure', 'brake_severe_degrade', 'vehicle_self_ignite', 'safety_device_failure', 'vehicle_out_of_control'];
+      if (zj60DayFaults.includes(faultType)) {
+        resultType = 'free_return';
+        freeReturn = true;
+        resultReasons.push('购车60日内或3000km内，发生' + getFaultLabel(faultType) + '（浙江省第27条扩展条件），免费退换');
+        resultLawRefs.push('《浙江省实施〈消法〉办法》第27条');
+      }
+      // 浙江省：发动机/变速器主要零件也算
+      if (['engine_major', 'transmission_major'].includes(faultType)) {
+        resultType = 'free_return';
+        freeReturn = true;
+        resultReasons.push('购车60日内或3000km内，发动机/变速器主要零部件质量问题（浙江省第27条扩展条件），免费退换并依法赔偿损失');
+        resultLawRefs.push('《浙江省实施〈消法〉办法》第27条');
+      }
+    }
+  }
+
+  // ===== 第三层：三包有效期内退换（第24条） =====
+  if (resultType === 'none' && tierWarranty) {
+    // 条件A：严重安全性能故障累计修理2次未排除（第24条第1项）
+    if (isSeriousFault && repairCount >= 2) {
+      resultType = 'paid_return';
+      resultReasons.push('严重安全性能故障（' + getFaultLabel(faultType) + '）累计修理' + repairCount + '次仍未排除，符合第24条第1项');
+      resultLawRefs.push('《家用汽车产品修理更换退货责任规定》第24条第1项');
+    }
+
+    // 条件B：同一主要零部件累计更换2次仍不能正常使用（第24条第3项）
+    if (resultType === 'none' && !isWearPart && repairCount >= 2 && isMajorPartType(faultType)) {
+      resultType = 'paid_return';
+      resultReasons.push(getFaultLabel(faultType) + '涉及的主要零部件累计更换' + repairCount + '次仍不能正常使用，符合第24条第3项');
+      resultLawRefs.push('《家用汽车产品修理更换退货责任规定》第24条第3项');
+
+      // 浙江省：发动机整体更换和主要零件更换次数可合并
+      if (isZhejiang && ['engine_major', 'transmission_major'].includes(faultType) && engineReplaceCount > 0) {
+        resultReasons.push('（浙江省规定：发动机/变速器整体更换与主要零件更换次数可合并计算）');
+        resultLawRefs.push('《浙江省实施〈消法〉办法》第27条');
+      }
+    }
+
+    // 条件C：累计修理超30日（第24条第4项）
+    if (resultType === 'none' && repairDays > 30) {
+      resultType = 'paid_return';
+      resultReasons.push('因质量问题累计修理时间已超过30日（实际' + repairDays + '日），符合第24条第4项');
+      resultLawRefs.push('《家用汽车产品修理更换退货责任规定》第24条第4项');
+    }
+
+    // 条件D：同一质量问题累计修理超4次（第24条第4项）
+    if (resultType === 'none' && repairCount >= 4) {
+      resultType = 'paid_return';
+      resultReasons.push('同一质量问题累计修理' + repairCount + '次（超过4次），符合第24条第4项');
+      resultLawRefs.push('《家用汽车产品修理更换退货责任规定》第24条第4项');
+    }
+  }
+
+  // ===== 浙江省30日内制动失效特殊规定（如适用） =====
+  // 浙版消法第27条还有更细的规定，已涵盖在60日规则中
+
+  // ===== 特殊提示：故障类型不满足，但可能满足其他条件 =====
+  let partialNotes = [];
+
+  if (resultType === 'none' && tier60Day3000Km) {
+    // 60日/3000km内，但故障不是5种法定情形
+    if (['brake_noise_wear', 'brake_major_part'].includes(faultType)) {
+      partialNotes.push('当前故障属于制动系统一般故障/零部件故障，不属于"制动失效"，不满足第23条免费退换条件。但如果该零部件属于主要零部件且已累计更换2次，可在三包期内申请有偿退换。');
+    }
+    if (['steering_power_loss'].includes(faultType)) {
+      partialNotes.push('当前故障为"转向助力失效"而非"转向完全失效"。根据国家缺陷产品管理中心相关判定指南，转向助力失效也可能构成严重安全性能故障，建议通过技术咨询人员判定。');
+    }
+  }
+
+  if (resultType === 'none' && tierWarranty && repairCount < 2 && isMajorPartType(faultType) && !isWearPart) {
+    partialNotes.push('当前故障涉及主要零部件但累计更换次数不足2次（当前' + repairCount + '次），待累计2次后可申请退换（第24条第3项）。建议保全每次维修记录。');
+  }
+
+  if (resultType === 'none' && !beyondWarranty && repairCount >= 2 && isWearPart) {
+    partialNotes.push('该零部件属于易损耗零部件，不适用主要零部件累计更换退换规则。易损耗零部件的质量保证期由生产者明示，可要求免费更换。');
+  }
+
+  // --- 费用计算 ---
+  let compDetail = [];
+  let dealerOwes = [];  // 经销商应退给消费者
+  let ownerOwes = [];   // 消费者应付给经销商
+  let totalDealerOwes = 0;
+  let totalOwnerOwes = 0;
+  let totalCompensation = 0;
+  let mileageForComp = mileage; // 默认用故障时里程计算使用补偿费
+  let mileageNote = '';
+
+  if (resultType !== 'none') {
+    // === A. 销售者应退还给消费者的费用 ===
+
+    // 车价款
+    dealerOwes.push({ label: '车辆购买价款', amount: carPrice });
+
+    // 车辆登记费
+    if (regFee > 0) {
+      dealerOwes.push({ label: '车辆登记费赔偿', amount: regFee });
+    }
+
+    // 加装/装饰费（扣除折旧）
+    if (modFee > 0) {
+      const modDepreciation = modFee * (depreciationRate / 100);
+      const modCompensation = modFee - modDepreciation;
+      dealerOwes.push({ label: '加装/装饰费赔偿（原值¥' + modFee.toFixed(0) + ' - 折旧¥' + modDepreciation.toFixed(0) + '）', amount: modCompensation });
+    }
+
+    // 相关服务费
+    if (serviceFee > 0) {
+      dealerOwes.push({ label: '相关服务费赔偿', amount: serviceFee });
+    }
+
+    // 浙江省额外赔偿
+    if (isZhejiang && freeReturn) {
+      dealerOwes.push({ label: '浙江省特别规定：依法赔偿损失', amount: 0, note: '具体损失金额需另行举证计算' });
+    }
+
+    totalDealerOwes = dealerOwes.reduce((sum, item) => sum + item.amount, 0);
+
+    // === B. 消费者应支付给销售者的费用（使用补偿费） ===
+    if (!freeReturn) {
+      // 确定使用补偿费的里程：优先首次维修里程，其次首次维修勾选，最后故障里程
+      if (useFirstRepairMileage && firstRepairMileage !== null) {
+        mileageForComp = firstRepairMileage;
+        mileageNote = '（按首次进店维修里程 ' + mileageForComp + ' km 计算）';
+      } else if (firstRepairMileage !== null && firstRepairMileage < mileage) {
+        mileageForComp = firstRepairMileage;
+        mileageNote = '（已自动采用首次维修里程 ' + mileageForComp + ' km，低于故障时里程 ' + mileage + ' km）';
+      }
+
+      const usageComp = carPrice * (mileageForComp / 1000) * (compCoeff / 100);
+      ownerOwes.push({
+        label: '使用补偿费',
+        amount: usageComp,
+        formula: '¥' + carPrice.toLocaleString() + ' × ' + mileageForComp + 'km ÷ 1000 × ' + compCoeff + '%',
+        note: mileageNote || '公式：车价款 × 里程 ÷ 1000 × n（第27条）',
+        isDeduct: true
+      });
+      totalOwnerOwes = usageComp;
+    } else {
+      // 免费退换：使用补偿费为0
+      ownerOwes.push({
+        label: '使用补偿费',
+        amount: 0,
+        note: '60日/3000km内或7日内免费退换 — 不支付使用补偿费（第22/23条）',
+        isDeduct: false
+      });
+      totalOwnerOwes = 0;
+    }
+
+    totalCompensation = totalDealerOwes - totalOwnerOwes;
+
+    // 构造补偿明细（合并展示）
+    compDetail = {
+      dealerOwes: dealerOwes,
+      ownerOwes: ownerOwes,
+      totalDealerOwes: totalDealerOwes,
+      totalOwnerOwes: totalOwnerOwes,
+      totalCompensation: totalCompensation,
+      freeReturn: freeReturn,
+      mileageForComp: mileageForComp,
+      compCoeff: compCoeff
+    };
+  }
+
+  // --- 渲染结果 ---
+  renderResult(resultType, resultReasons, resultLawRefs, freeReturn, compDetail, partialNotes, daysSinceDelivery, mileage, isZhejiang, faultType, beyondWarranty);
+}
+
+// ============ 渲染函数 ============
+function renderResult(resultType, reasons, lawRefs, freeReturn, compDetail, partialNotes, days, mileage, isZhejiang, faultType, beyondWarranty) {
+  const section = document.getElementById('resultSection');
+  section.classList.add('show');
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // ---- Banner ----
+  let bannerClass, icon, title, subtitle;
+  if (resultType === 'free_return') {
+    bannerClass = 'qualify';
+    icon = '✅';
+    title = '符合免费退换车条件！';
+    subtitle = '销售者应免费为消费者更换或退货，不收取使用补偿费。';
+  } else if (resultType === 'paid_return') {
+    bannerClass = 'qualify';
+    icon = '✅';
+    title = '符合退换车条件（需支付使用补偿费）';
+    subtitle = '在三包有效期内，可要求退换整车，需支付合理使用补偿费。';
+  } else {
+    bannerClass = partialNotes.length > 0 ? 'partial' : 'not-qualify';
+    icon = partialNotes.length > 0 ? '⚠️' : '❌';
+    title = partialNotes.length > 0 ? '暂不满足退换车条件，但请注意以下提示' : '暂不满足退换车条件';
+    subtitle = beyondWarranty ? '已超出三包有效期（2年/5万km）。' : '根据当前输入信息，暂不满足法定退换车条件。';
+  }
+
+  document.getElementById('resultBanner').innerHTML = `
+    <div class="result-banner ${bannerClass}">
+      <span class="banner-icon">${icon}</span>
+      <div class="banner-content">
+        <h3>${title}</h3>
+        <p>${subtitle}</p>
+        <p style="margin-top:8px;font-size:12px;color:var(--text-muted);">
+          购车至故障：${days} 天 | 里程：${mileage} km | 管辖依据：${isZhejiang ? '国家规定 + 浙江省实施办法' : '国家规定'}
+        </p>
+      </div>
+    </div>
+  `;
+
+  // ---- 判断理由 ----
+  const legalCard = document.getElementById('legalCard');
+  if (reasons.length > 0) {
+    legalCard.style.display = 'block';
+    let html = '';
+    reasons.forEach(r => {
+      html += `<div class="legal-ref"><p>📌 ${r}</p></div>`;
+    });
+    if (lawRefs.length > 0) {
+      html += `<div class="legal-ref"><h4>适用法条</h4>`;
+      lawRefs.forEach(l => { html += `<p>• ${l}</p>`; });
+      html += `</div>`;
+    }
+    document.getElementById('legalContent').innerHTML = html;
+  } else {
+    legalCard.style.display = 'none';
+  }
+
+  // ---- 补偿明细 ----
+  const compCard = document.getElementById('compensationCard');
+  if (compDetail && compDetail.dealerOwes && compDetail.dealerOwes.length > 0) {
+    compCard.style.display = 'block';
+
+    let html = '';
+
+    // A. 经销商应退
+    html += '<div style="margin-bottom:16px;">';
+    html += '<h3 style="font-size:15px;color:var(--green);margin-bottom:8px;">A. 销售者应退还给消费者的费用</h3>';
+    html += '<table class="comp-table"><tbody>';
+    compDetail.dealerOwes.forEach(item => {
+      const note = item.note ? `<br><span style="font-size:11px;color:var(--text-muted);">${item.note}</span>` : '';
+      html += `<tr><td>${item.label}${note}</td><td class="amount" style="color:var(--green);">${formatMoney(item.amount)}</td></tr>`;
+    });
+    html += `<tr style="background:var(--green-bg);"><td><strong>小计（A）</strong></td><td class="amount" style="font-weight:700;color:var(--green);font-size:15px;">${formatMoney(compDetail.totalDealerOwes)}</td></tr>`;
+    html += '</tbody></table></div>';
+
+    // B. 消费者应付
+    html += '<div style="margin-bottom:16px;">';
+    html += '<h3 style="font-size:15px;color:var(--red);margin-bottom:8px;">B. 消费者应支付给销售者的费用（使用补偿费）</h3>';
+    html += '<table class="comp-table"><tbody>';
+    compDetail.ownerOwes.forEach(item => {
+      const note = item.note ? `<br><span style="font-size:11px;color:var(--text-muted);">${item.note}</span>` : '';
+      const formula = item.formula ? `<br><span style="font-size:12px;color:var(--text-muted);font-family:'SF Mono',Consolas,monospace;">= ${item.formula}</span>` : '';
+      const color = item.isDeduct ? 'color:var(--red);' : 'color:var(--text-muted);';
+      html += `<tr><td>${item.label}${formula}${note}</td><td class="amount" style="${color}">${item.amount > 0 ? '-' : ''}${formatMoney(Math.abs(item.amount))}</td></tr>`;
+    });
+    html += `<tr style="background:var(--red-bg);"><td><strong>小计（B）</strong></td><td class="amount" style="font-weight:700;color:var(--red);font-size:15px;">${compDetail.totalOwnerOwes > 0 ? '-' : ''}${formatMoney(compDetail.totalOwnerOwes)}</td></tr>`;
+    html += '</tbody></table></div>';
+
+    // 法律依据
+    if (!compDetail.freeReturn) {
+      html += `<div class="legal-ref" style="margin:12px 0;"><p>📜 <strong>法律依据：</strong>《家用汽车产品修理更换退货责任规定》第27条 — 消费者依照第24条退换车的，应当向销售者支付使用补偿费。补偿费 = 车价款 × 行驶里程 ÷ 1000 × n。使用补偿系数 n 由生产者明示在三包凭证上，n ≤ 0.5%。</p></div>`;
+    }
+
+    // C. 净额
+    html += '<table class="comp-table"><tbody>';
+    html += `<tr class="total-row" style="background:var(--accent-light);"><td><strong>净退赔金额（A - B）</strong></td><td class="amount" style="font-size:20px;font-weight:700;color:var(--accent);">${formatMoney(compDetail.totalCompensation)}</td></tr>`;
+    html += '</tbody></table>';
+
+    document.getElementById('compTable').innerHTML = html;
+  } else {
+    compCard.style.display = 'none';
+  }
+
+  // ---- 重要提示 ----
+  const notesCard = document.getElementById('notesCard');
+  let allNotes = [...partialNotes];
+
+  // 通用提示
+  if (resultType !== 'none') {
+    allNotes.push('销售者应在收到退换要求后 <strong>10个工作日内</strong> 答复，符合条件后 <strong>20个工作日内</strong> 完成退换。');
+    allNotes.push('换车后，三包有效期和包修期 <strong>重新计算</strong>。');
+    allNotes.push('经营者不得以"未在4S店保养"为由拒绝承担三包责任（第32条第2款）。');
+  }
+
+  if (resultType === 'none' && !beyondWarranty) {
+    allNotes.push('建议：保全所有维修工单、检测报告、沟通记录（微信/短信），作为后续维权的证据。');
+    allNotes.push('如对4S店认定结果有异议，可拨打 <strong>12315</strong> 向市场监管部门投诉，或申请技术咨询人员介入判定。');
+  }
+
+  if (faultType === 'brake_boost_failure' && resultType === 'none') {
+    allNotes.push('<strong>特别提醒：</strong>制动助力失效在相关技术判定指南中被明确列为制动失效的一种情形。如经销商以"常规制动仍有效"为由拒绝，可引用 GB/T 43388-2023 申请技术鉴定。');
+  }
+
+  if (allNotes.length > 0) {
+    notesCard.style.display = 'block';
+    document.getElementById('notesContent').innerHTML = allNotes.map(n => `<div class="legal-ref"><p>• ${n}</p></div>`).join('');
+  } else {
+    notesCard.style.display = 'none';
+  }
+}
+
+// ============ 辅助函数 ============
+function getFaultLabel(type) {
+  const map = {
+    'brake_failure': '制动完全失效',
+    'brake_boost_failure': '制动助力失效',
+    'brake_severe_degrade': '制动效能严重下降',
+    'brake_major_part': '制动系统主要零部件故障',
+    'brake_noise_wear': '制动异响/抖动（一般故障）',
+    'steering_failure': '转向完全失效',
+    'steering_power_loss': '转向助力失效',
+    'engine_major': '发动机需更换整体或主要零部件',
+    'transmission_major': '变速器需更换整体或主要零部件',
+    'drive_motor_major': '动力蓄电池/驱动电机需更换',
+    'body_crack': '车身开裂',
+    'fuel_leak': '燃油泄漏',
+    'battery_fire': '动力蓄电池起火',
+    'vehicle_self_ignite': '车辆自燃',
+    'safety_device_failure': '安全装置失效',
+    'vehicle_out_of_control': '因质量问题引起车辆失控',
+    'other': '其他类型故障'
+  };
+  return map[type] || type;
+}
+
+function isMajorPartType(faultType) {
+  // 这些故障类型通常涉及国家规定的主要零部件
+  return ['brake_major_part', 'brake_failure', 'brake_boost_failure', 'brake_severe_degrade',
+          'steering_failure', 'steering_power_loss',
+          'engine_major', 'transmission_major', 'drive_motor_major',
+          'safety_device_failure'].includes(faultType);
+}
+
+function formatMoney(amount) {
+  const abs = Math.abs(amount);
+  const formatted = abs.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return amount < 0 ? '-¥' + formatted : '¥' + formatted;
+}
+
+function resetForm() {
+  document.querySelectorAll('input').forEach(el => {
+    if (el.type === 'checkbox') el.checked = false;
+    else el.value = '';
+  });
+  document.querySelectorAll('select').forEach(el => el.value = '');
+  document.getElementById('compCoeff').value = '0.5';
+  document.getElementById('depreciationRate').value = '20';
+  document.getElementById('repairCount').value = '0';
+  document.getElementById('repairDays').value = '0';
+  document.getElementById('engineReplaceCount').value = '0';
+  document.getElementById('regFee').value = '0';
+  document.getElementById('modFee').value = '0';
+  document.getElementById('serviceFee').value = '0';
+  document.getElementById('compCoeffCustom').value = '0.5';
+  document.getElementById('customCoeffGroup').style.display = 'none';
+  document.getElementById('resultSection').classList.remove('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
