@@ -2,13 +2,19 @@
   "version": 1,
   "weeks": {
     "2026-W30": {
-      "total": 14,
+      "total": 15,
       "users": [
         "u_mrul86oc_caax66zb",
         "u_mrum0xss_jgf0z4vu",
         "u_mrwz3yrq_pza7y7fb"
       ],
       "tab3": {
+        "total": 1,
+        "users": [
+          "u_mrum0xss_jgf0z4vu"
+        ]
+      },
+      "tab2": {
         "total": 1,
         "users": [
           "u_mrum0xss_jgf0z4vu"
