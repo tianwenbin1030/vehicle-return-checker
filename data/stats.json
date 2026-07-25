@@ -22,7 +22,7 @@
       }
     },
     "2026-W31": {
-      "total": 1,
+      "total": 2,
       "users": [
         "u_mrum0xss_jgf0z4vu"
       ],
@@ -37,8 +37,10 @@
         ]
       },
       "tab3": {
-        "total": 0,
-        "users": []
+        "total": 1,
+        "users": [
+          "u_mrum0xss_jgf0z4vu"
+        ]
       }
     }
   }
