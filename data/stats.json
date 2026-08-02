@@ -54,6 +54,30 @@
           "u_ms313lbz_z3a3399k"
         ]
       }
+    },
+    "2026-W32": {
+      "total": 1,
+      "users": [
+        "u_mrum0xss_jgf0z4vu"
+      ],
+      "tab1": {
+        "total": 0,
+        "users": []
+      },
+      "tab2": {
+        "total": 0,
+        "users": []
+      },
+      "tab3": {
+        "total": 0,
+        "users": []
+      },
+      "tab4": {
+        "total": 1,
+        "users": [
+          "u_mrum0xss_jgf0z4vu"
+        ]
+      }
     }
   }
 }
