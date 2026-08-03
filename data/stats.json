@@ -56,10 +56,11 @@
       }
     },
     "2026-W32": {
-      "total": 5,
+      "total": 6,
       "users": [
         "u_mrum0xss_jgf0z4vu",
-        "u_ms308luh_88pv3ko2"
+        "u_ms308luh_88pv3ko2",
+        "u_mscupd11_i435hl25"
       ],
       "tab1": {
         "total": 0,
@@ -74,10 +75,11 @@
         "users": []
       },
       "tab4": {
-        "total": 5,
+        "total": 6,
         "users": [
           "u_mrum0xss_jgf0z4vu",
-          "u_ms308luh_88pv3ko2"
+          "u_ms308luh_88pv3ko2",
+          "u_mscupd11_i435hl25"
         ]
       }
     }
