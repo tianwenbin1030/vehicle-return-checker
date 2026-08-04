@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "mse91b5g",
+    "reportDate": "2026-07-27",
+    "brand": "零跑",
+    "model": "C11",
+    "vin": "LFZ63AZ52TD348585",
+    "saleDate": "2026-07-24",
+    "faultDate": "2026-07-27",
+    "mileage": "728",
+    "city": "昆山",
+    "disposal": "维修",
+    "desc": "",
+    "amount": "4000",
+    "progress": "LPO行程传感器故障",
+    "status": "进行中"
+  }
+]
