@@ -1272,35 +1272,58 @@ var _casesCache = [];
 function loadRecords() {
   trackUsage('tab4');
   document.getElementById('recordTableBody').innerHTML = '<tr><td colspan="13" style="text-align:center;padding:20px;color:var(--text-muted);">加载中...</td></tr>';
-  fetch(CASES_API+'?t='+Date.now(), {headers:{'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'}})
-    .then(function(r){return r.json();})
-    .then(function(data){
-      _casesCache = [];
-      if (data.content) {
-        try { _casesCache = JSON.parse(base64ToUtf8(data.content.replace(/\s/g,''))); } catch(e){}
+  // Try load from GitHub raw first, fallback to localStorage
+_loadingRecords = true;
+fetch(CASES_API+'?t='+Date.now())
+    .then(function(r){
+      if (!r.ok) throw new Error('fetch failed');
+      return r.text();
+    })
+    .then(function(text){
+      try { _casesCache = JSON.parse(text); } catch(e){ _casesCache = []; }
+      if (!Array.isArray(_casesCache)) _casesCache = [];
+      // Sync to localStorage
+      localStorage.setItem('_vrc_cases', JSON.stringify(_casesCache));
+    })
+    .catch(function(){
+      // Fallback to localStorage
+      try {
+        var stored = localStorage.getItem('_vrc_cases');
+        _casesCache = stored ? JSON.parse(stored) : [];
         if (!Array.isArray(_casesCache)) _casesCache = [];
-      }
+      } catch(e) { _casesCache = []; }
+    })
+    .then(function(){
+      _loadingRecords = false;
       renderRecordTable();
       renderCharts();
-    })
-    .catch(function(){ _casesCache = []; renderRecordTable(); renderCharts(); });
+    });
 }
 
 // Save records to GitHub
 function saveCasesToGitHub(callback) {
-  var content = utf8ToBase64(JSON.stringify(_casesCache,null,2));
-  fetch(CASES_API+'?t='+Date.now(), {headers:{'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'}})
-    .then(function(r){return r.json();})
-    .then(function(data){
-      var sha = data.sha || '';
-      return fetch(CASES_API, {
-        method: 'PUT',
-        headers: {'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
-        body: JSON.stringify({message:'update cases #'+_casesCache.length, content:content, sha:sha})
-      });
-    })
-    .then(function(){ if(callback) callback(); })
-    .catch(function(){ if(callback) callback(); });
+  // Save to localStorage (GitHub Pages can'\''t write without token)
+  try {
+    localStorage.setItem('_vrc_cases', JSON.stringify(_casesCache));
+  } catch(e) {}
+  // Also try GitHub API (will work if token is present, e.g. in CloudStudio version)
+  if (GH_TOKEN) {
+    var content = utf8ToBase64(JSON.stringify(_casesCache,null,2));
+    fetch('https://api.github.com/repos/tianwenbin1030/vehicle-return-checker/contents/data/cases.json?t='+Date.now(), {headers:{'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'}})
+      .then(function(r){return r.json();})
+      .then(function(data){
+        var sha = data.sha || '';
+        return fetch('https://api.github.com/repos/tianwenbin1030/vehicle-return-checker/contents/data/cases.json', {
+          method: 'PUT',
+          headers: {'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+          body: JSON.stringify({message:'update cases #'+_casesCache.length, content:content, sha:sha})
+        });
+      })
+      .then(function(){ if(callback) callback(); })
+      .catch(function(){ if(callback) callback(); });
+  } else {
+    if(callback) callback();
+  }
 }
 
 // Smart parse
@@ -1534,6 +1557,8 @@ function trackUsage(tab) {
   tab = tab || 'tab1';
   if (sessionStorage.getItem('_vrc_tracked_'+tab)) return;
   sessionStorage.setItem('_vrc_tracked_'+tab,'1');
+  // Skip tracking if no GitHub token (Pages version)
+  if (!GH_TOKEN) return;
   var uid = getUserFingerprint(); var wk = getWeekKey();
   fetch(GH_API+'?t='+Date.now(),{headers:{'Authorization':'token '+GH_TOKEN,'Accept':'application/vnd.github.v3+json'}})
   .then(function(r){return r.json();})
