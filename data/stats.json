@@ -90,7 +90,7 @@
       }
     },
     "2026-W33": {
-      "total": 1,
+      "total": 2,
       "users": [
         "u_mrum0xss_jgf0z4vu"
       ],
@@ -101,8 +101,10 @@
         ]
       },
       "tab2": {
-        "total": 0,
-        "users": []
+        "total": 1,
+        "users": [
+          "u_mrum0xss_jgf0z4vu"
+        ]
       },
       "tab3": {
         "total": 0,
