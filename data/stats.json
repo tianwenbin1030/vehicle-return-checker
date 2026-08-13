@@ -88,6 +88,30 @@
           "u_ms2z32z3_fmq03bha"
         ]
       }
+    },
+    "2026-W33": {
+      "total": 1,
+      "users": [
+        "u_mrum0xss_jgf0z4vu"
+      ],
+      "tab1": {
+        "total": 1,
+        "users": [
+          "u_mrum0xss_jgf0z4vu"
+        ]
+      },
+      "tab2": {
+        "total": 0,
+        "users": []
+      },
+      "tab3": {
+        "total": 0,
+        "users": []
+      },
+      "tab4": {
+        "total": 0,
+        "users": []
+      }
     }
   }
 }
